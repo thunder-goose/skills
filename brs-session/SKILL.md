@@ -1,200 +1,183 @@
 ---
 name: brs-session
-description: Interview a business stakeholder in plain language to capture a Business Requirements Specification (BRS) for a process, need, or initiative. Produces a BRS-<slug>.md file plus any supporting files needed to make the BRS self-contained (glossary, stakeholders, scenarios, open questions). Use when a non-technical user says "I need to write up the business requirements", "let's capture the BRS for X", "I want to document what the business needs before anything technical", or describes a business problem they want pinned down before it goes to a delivery team. Purely business-facing — never asks technical or implementation questions and never writes code.
+description: Run a plain-language interview to create or resume a Business Requirements Specification (BRS) for one business process, need, or initiative. Capture the business outcome, current situation, solution-neutral requirements, stakeholders, constraints, scope, success measures, and open questions in a slug-named BRS Markdown file. When a build-ready handoff is requested, also capture traceable business scenarios, rules, information needs, and operational qualities. Use before functional specification, screen design, technical design, or delivery. Do not use for system behavior, architecture, implementation planning, or code.
 ---
 
-<what-to-do>
+# BRS Session
 
-You are running a BRS capture session for a business user. The artifact you produce is a Business Requirements Specification — *what the business needs and why*, not *how the system will deliver it*. Never drift into implementation.
+Create a concise, defensible record of **what the business needs and why**. Do not design the solution.
 
-If the user volunteers implementation detail ("it should use a spreadsheet", "make it call our API"), acknowledge it, park it in `NOTES.md` as a preference, and pivot back to the business question.
+## Working Rules
 
-Run the session in this order. Never skip a step. Confirm before moving on.
+- Keep one bounded business need per BRS.
+- Ask at most one unanswered primary question per turn unless the user requests a batch interview.
+- Capture all useful information the user volunteers; do not ask for it again.
+- Update the BRS after every substantive answer so the session can be resumed safely.
+- Use plain language and preserve the user's terminology.
+- Do not invent facts, decisions, owners, priorities, measures, or solution behavior.
+- Keep IDs stable after assignment. Add new IDs; never renumber existing ones.
+- When a matching `DISCOVERY-INDEX-<slug>.md` exists, update its BRS status, blockers, and next action before ending the session.
+- Do not modify source code or produce technical designs.
 
-1. **Preflight.** Ask: *"What's the business need, process, or initiative we're documenting today?"* Confirm the scope is bounded enough for one BRS — if the answer covers multiple distinct needs, ask which to tackle first and park the rest.
-2. **Pick a slug.** From the topic, derive a short kebab-case slug. E.g. *"Refund eligibility for digital goods"* → `refund-eligibility-digital`. Propose it and let the user tweak. The slug names the main file: `BRS-<slug>.md`.
-3. **Create the file.** Write `BRS-<slug>.md` in the current working directory using the template in the supporting section. Fill in only the header (slug, captured date, captured-with) at this stage.
-4. **Interview.** Walk through the eight BRS questions below, **one at a time**. Wait for the answer before asking the next. Update `BRS-<slug>.md` immediately after each answer — do not batch.
-5. **Offer supporting files.** As the interview surfaces them, propose creating supporting files alongside the BRS (see "Supporting files" in the supporting section). Common ones: `GLOSSARY.md`, `STAKEHOLDERS.md`, `SCENARIOS.md`, `OPEN-QUESTIONS.md`, `OUT-OF-SCOPE.md`. Only create a file if the BRS actually needs it — don't manufacture files for completeness.
-6. **Read back.** When all eight questions are answered, read the full BRS back to the user in plain English: *"Here's what I captured — did I get it right?"* Edit on the spot if not.
-7. **Declare done-when.** State explicitly: *"The BRS is in a defensible state for <topic>. Open questions still parked: OQ-001, OQ-002, ..."* If anything material is unresolved, name it and the owner.
-8. **Suggest next step.** Offer one of: (a) take the BRS to delivery as-is, (b) escalate to a Functional Requirements Specification using `/frs-session` because the system behaviour now needs to be pinned down, or (c) stop here and share the BRS with another stakeholder for review.
+Classify solution-related details carefully:
 
-## The eight BRS questions
+- Record a non-negotiable external rule under **Constraints** when the user identifies its source or business reason.
+- Record a proposed tool, screen, UI, platform, API, or implementation approach under **Notes / solution preferences**.
+- Do not ask follow-up questions about architecture or implementation.
 
-Ask these one at a time, in order, in plain language. Re-word for the user's domain — don't read them robotically.
+## Workflow
 
-1. **Goal** — *"What's the business outcome we want? In one sentence, what does success look like?"*
-2. **Trigger** — *"When does this situation come up? What kicks it off?"*
-3. **Current pain** — *"How is this handled today? Where does it hurt, slow down, or break?"*
-4. **Desired outcome** — *"After this is in place, what's different? What do we want to be true that isn't true today?"*
-5. **Stakeholders + roles** — *"Who's involved? Who requests, reviews, approves, gets notified, or is affected?"*
-6. **Constraints** — *"What rules, policies, deadlines, or compliance points must this respect?"*
-7. **Out of scope** — *"What should this NOT cover? Where should the work stop?"*
-8. **Success measure** — *"How will we know in a month or a quarter that this is working?"*
+1. **Choose start or resume.**
+   - When a topic is supplied, use it and ask only for missing information.
+   - When no topic is supplied, ask what business need or process to document.
+   - For a resume request, open the named BRS. If none is named, find main BRS files by the `# BRS:` heading and `**Slug:**` field; resume the only match or ask which one when several match.
+2. **Bound the scope.**
+   - Confirm only when the topic contains multiple independent needs or its boundary is unclear.
+   - Park separate needs under **Notes / deferred topics / solution preferences** and continue with the selected one.
+3. **Choose the file.**
+   - Derive a lowercase kebab-case slug under 40 characters and use `BRS-<slug>.md`.
+   - State the filename before writing. Ask for confirmation only when the slug is ambiguous.
+   - If the file exists and this is not a resume, ask whether to continue it or create the next unused `BRS-<slug>-vN.md`. Never overwrite silently.
+4. **Initialize the BRS.**
+   - Write the full template below with `Draft` status and placeholders.
+   - Use the current date. Record the stakeholder's name or role when known; otherwise use `Not provided`.
+5. **Capture the core BRS.**
+   - Work through the seven core capture areas below.
+   - Ask the first unanswered primary question, then use brief follow-ups only for material ambiguity.
+   - Turn distinct business needs into `BR-###` entries. Add priority only when known.
+   - Record unresolved decisions as `OQ-###`; use a role as owner when known, otherwise `Unassigned`.
+6. **Add build-handoff detail when needed.**
+   - Run the build-handoff extension when the user asks for build-ready artifacts, screen or flow design, functional specification, or delivery intake.
+   - Otherwise offer the extension after the core BRS is reviewed; do not force it for early discovery.
+   - Link each `SCN-###`, `RULE-###`, `INFO-###`, and `QUAL-###` item to related `BR-###` IDs when known.
+7. **Review.**
+   - Replace every placeholder with captured content, `Not applicable` plus a reason, or `Not requested` for the optional extension.
+   - Give a concise plain-language recap and ask whether it is accurate.
+   - Apply corrections immediately. Set status to `Reviewed` only after explicit confirmation and to `Approved` only when the user explicitly approves it.
+8. **Close and hand off.**
+   - Assess handoff readiness using the checklist below.
+   - State whether the BRS is ready for stakeholder review, build discovery, or blocked by material open questions.
+   - Name material open-question IDs and owners.
+   - Update the matching discovery index when present; do not duplicate detailed BRS content there.
+   - Recommend `screen-spec-session` when user-facing screens and flows are the next artifact. Recommend functional specification when broader system behavior must be defined.
 
-## Hard rules
+## Core Capture Areas
 
-- **Never** ask technical or architecture questions. No databases, APIs, frameworks, file formats, UI specifics, programming languages.
-- **One question at a time.** Wait for the answer.
-- **Capture inline.** Update `BRS-<slug>.md` after every answered question. Don't batch.
-- **Park, don't resolve.** Anything that needs Legal / Finance / Product input goes to `OPEN-QUESTIONS.md` as `OQ-###` with a named owner. Move on; do not invent answers.
-- **One BRS per session.** If the conversation reveals two distinct needs, stop and ask which to tackle first.
-- **No skill generation, no code, no system design.** This skill produces a business artifact. The next step (skill, FRS, implementation) is someone else's call.
+Reword these for the user's domain. Treat the examples as prompts, not a script.
 
-</what-to-do>
+1. **Business outcome**: "What outcome are we trying to achieve, and why does it matter now?"
+2. **Current situation**: "What triggers this need, how is it handled today, and where does it fail or create pain?"
+3. **Business requirements**: "What must the business be able to do, decide, prevent, or demonstrate for the outcome to be achieved?"
+4. **Stakeholders**: "Who requests, performs, decides, approves, receives, or is affected by this process?"
+5. **Constraints and dependencies**: "Which policies, laws, deadlines, budgets, commitments, assumptions, or external dependencies must be respected?"
+6. **Scope**: "What is included, and what must this effort explicitly not cover?"
+7. **Success measures**: "What observable measures would show in a month or quarter that this is working?"
 
-<supporting-info>
+## Build-Handoff Extension
 
-## BRS file template (`BRS-<slug>.md`)
+Capture business detail without choosing screens or technical behavior.
+
+1. **Scenarios and exceptions**: "What representative situations must work, including unusual, rejected, cancelled, or failed cases?"
+2. **Business rules**: "What decisions, approvals, calculations, thresholds, timings, or prohibitions govern those situations?"
+3. **Information needs**: "What information must people provide, see, receive, retain, or report on to perform the work?"
+4. **Operational qualities**: "What volume, turnaround, availability, accessibility, privacy, audit, retention, or language expectations matter?"
+
+## BRS Template
 
 ```md
-# BRS: <Process / need / initiative name>
+# BRS: <Business need or initiative>
 
 **Slug:** <slug>
 **Captured:** <YYYY-MM-DD>
-**Captured with:** <user name or role>
-**Status:** Draft | Reviewed | Approved
+**Captured with:** <name, role, or Not provided>
+**Status:** Draft
 
-## Goal
-<one-sentence business outcome>
+## Business outcome
+Not captured yet.
 
-## Trigger
-<what starts this need / where it shows up today>
+## Current situation
+- **Trigger:** Not captured yet.
+- **Current handling:** Not captured yet.
+- **Pain:** Not captured yet.
 
-## Current pain
-<what's slow, error-prone, or missing today>
+## Business requirements
+- BR-001 — Not captured yet.
 
-## Desired outcome
-<the after-state — what's true once this is delivered>
+## Stakeholders and responsibilities
+- Not captured yet.
 
-## Stakeholders + roles
-- **<Role>:** <person or team>, <what they do in this process>
-- ...
+## Constraints, assumptions, and dependencies
+- Not captured yet.
 
-## Constraints
-- <rule, policy, deadline, compliance point>
-- ...
+## Scope
+### In scope
+- Not captured yet.
 
-## Out of scope
-- <explicit non-goal>
-- ...
-(or: see OUT-OF-SCOPE.md if the list grows long)
+### Out of scope
+- Not captured yet.
 
-## Success measure
-<how we'll know in a month / quarter that this is working>
+## Success measures
+- SM-001 — Not captured yet.
+
+## Build-handoff detail
+### Scenarios and exceptions
+- SCN-001 — Not captured yet. (Supports: BR-001)
+
+### Business rules
+- RULE-001 — Not captured yet. (Supports: BR-001)
+
+### Information needs
+- INFO-001 — Not captured yet. (Supports: BR-001)
+
+### Operational qualities
+- QUAL-001 — Not captured yet. (Supports: BR-001)
 
 ## Open questions
-- OQ-001 — <question> (owner: <name>)
-- ...
-(or: see OPEN-QUESTIONS.md if the list grows long)
+- None recorded.
+
+## Notes / deferred topics / solution preferences
+- None recorded.
 
 ## Supporting files
-- GLOSSARY.md — <if created>
-- STAKEHOLDERS.md — <if created>
-- SCENARIOS.md — <if created>
-- ...
-
-## Notes / preferences
-<anything the user volunteered that isn't a hard requirement — implementation hints, past attempts, opinions>
+- None.
 ```
 
-## Supporting files
+Write requirements and rules as short, testable, solution-neutral statements:
 
-Only create a supporting file when the BRS would be confusing or incomplete without it. Don't add files for the sake of it.
+- `BR-001 — Refund decisions must be consistent across service teams. (Priority: Must)`
+- `RULE-001 — Refunds over $500 require finance approval. (Supports: BR-001)`
+- `INFO-001 — Reviewers need the purchase date, amount, and refund reason. (Supports: BR-001)`
+- `QUAL-001 — A refund decision must be recorded with the reviewer and decision time. (Supports: BR-001)`
 
-### `GLOSSARY.md`
-Create when the topic uses domain terms a reader outside the team wouldn't know.
-```md
-# Glossary
+Avoid implementation statements such as `Build a React screen backed by the refunds API`.
 
-- **<Term>** — <plain-language definition>. <Optional: where it's used.>
-```
+## Handoff Readiness
 
-### `STAKEHOLDERS.md`
-Create when there are more than ~4 roles, or when responsibilities need detail beyond a line each.
-```md
-# Stakeholders
+A BRS is ready for downstream screen or functional design when:
 
-## <Role name>
-- **Who:** <person, team, or function>
-- **Interest:** <why they care about this>
-- **Responsibility:** <what they do in this process>
-- **Sign-off:** <yes / no / informed>
-```
+- The outcome, scope, roles, and core `BR-###` requirements are stable enough to design against.
+- Representative happy-path and exception `SCN-###` scenarios are captured.
+- Material decision and approval `RULE-###` rules are captured.
+- Necessary business `INFO-###` information is identified without prescribing controls or data models.
+- Material `QUAL-###` volume, timing, accessibility, privacy, audit, retention, and availability needs are captured.
+- Material open questions have owners, and blockers are clearly identified.
+- Solution preferences are distinguishable from mandatory constraints.
 
-### `SCENARIOS.md`
-Create when the user describes specific examples ("for instance, last month a customer asked for..."). Capture each as a concrete story.
-```md
-# Scenarios
+The BRS may remain `Draft` during downstream discovery, but the next skill must carry unresolved items and assumptions forward rather than inventing answers.
 
-## S-001 — <short name>
-**Situation:** <one-line setup>
-**What happens today:** <current handling>
-**What should happen:** <desired handling>
-**Why it matters:** <which BRS goal / constraint it tests>
-```
+## Supporting Files
 
-### `OPEN-QUESTIONS.md`
-Create when more than ~3 open questions accumulate. Move them out of `BRS-<slug>.md` and link from there.
-```md
-# Open Questions
+Keep content in the main BRS by default. Split content only when a section becomes hard to scan, then link the file from **Supporting files**.
 
-## OQ-001 — <question>
-- **Why it matters:** <impact on the BRS if unresolved>
-- **Owner:** <named person>
-- **Needed by:** <date or milestone, if known>
-- **Status:** Open | Awaiting answer | Resolved → <resolution>
-```
+Use slug-scoped names to avoid collisions:
 
-### `OUT-OF-SCOPE.md`
-Create when the out-of-scope list grows beyond ~5 items or needs reasoning. Helps prevent scope creep later.
-```md
-# Out of Scope
+- `BRS-<slug>-glossary.md` for substantial domain terminology.
+- `BRS-<slug>-stakeholders.md` for many roles or detailed responsibilities.
+- `BRS-<slug>-scenarios.md` for detailed scenarios and exceptions.
+- `BRS-<slug>-rules.md` for decision tables or numerous business rules.
+- `BRS-<slug>-information.md` for substantial information or reporting needs.
+- `BRS-<slug>-qualities.md` for substantial operational or quality needs.
+- `BRS-<slug>-open-questions.md` when open questions need status, dates, or detailed impact.
+- `BRS-<slug>-out-of-scope.md` when exclusions need rationale or future ownership.
 
-## OOS-001 — <thing that's out>
-- **Why it's out:** <reason>
-- **Where it might live instead:** <other initiative, future phase, never>
-```
-
-## When to escalate to FRS instead
-
-The BRS captures *what* the business needs. The FRS captures *how the system will behave* to deliver it. Offer to escalate to `/frs-session` (the existing FRS grilling wrapper) if any of these are true:
-
-- The user starts naturally drifting into system behaviour ("when the user clicks submit, the system should...").
-- The BRS is approved and the next question is genuinely "now what does the system do?".
-- Multiple roles each have their own decision rules that need pinning down.
-- Regulated rules (legal, finance, compliance) need rule-by-rule definition.
-
-Phrase it as: *"This BRS looks solid. The next layer — system behaviour rules — belongs in an FRS. Want me to hand you off to `/frs-session`?"*
-
-## Slug derivation rules
-
-- Lowercase, kebab-case. No `BRS-` prefix in the slug itself (that's added in the filename).
-- Noun-first when natural: `refund-eligibility`, not `define-refund-eligibility`.
-- Drop filler words ("the", "of", "for") unless they disambiguate.
-- Keep under ~40 characters.
-- If `BRS-<slug>.md` already exists in the working directory, ask the user: continue the existing one, or create `BRS-<slug>-v2.md`?
-
-## What this skill does NOT do
-
-- Write or modify source code.
-- Design system behaviour, UI, APIs, or data models.
-- Produce a Functional Requirements Specification (use `/frs-session` for that).
-- Produce a Claude Code skill, plugin, or any executable artifact.
-- Resolve open questions on the user's behalf. If the answer needs Legal / Finance / Product input, park as `OQ-###` and move on.
-- Bundle multiple business needs into one BRS. One topic per session.
-
-## When NOT to invoke this skill
-
-- The user wants system-level behaviour rules → `/frs-session`.
-- The user wants a skill built → `write-a-skill` (if installed).
-- The business need is a one-off ad-hoc decision, not something worth documenting → just help them directly.
-
-## Common invocations
-
-- `/brs-session` — ask *"What's the business need we're documenting?"* first.
-- `/brs-session Refund eligibility for digital goods` — start with topic pre-named, still walk the eight questions.
-- `/brs-session resume` — re-open the most recent `BRS-*.md` in the working directory and continue from where the answers run out.
-
-</supporting-info>
+Preserve IDs and source links when moving content out of the main BRS. Never create support files merely for completeness.

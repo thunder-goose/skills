@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solution Discovery Session"
+  short_description: "Guide business users from need to screen-ready brief"
+  default_prompt: "Use $solution-discovery-session to guide this business idea from requirements through screen and flow specifications."

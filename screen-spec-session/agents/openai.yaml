@@ -1,0 +1,4 @@
+interface:
+  display_name: "Screen Spec Session"
+  short_description: "Define traceable screens, flows, states, and fields"
+  default_prompt: "Use $screen-spec-session to turn this BRS into linked screen, flow, and field specifications."

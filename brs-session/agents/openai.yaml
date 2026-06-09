@@ -1,0 +1,4 @@
+interface:
+  display_name: "BRS Session"
+  short_description: "Capture traceable, build-ready business requirements"
+  default_prompt: "Use $brs-session to capture a traceable Business Requirements Specification for this business need."
