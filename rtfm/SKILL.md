@@ -1,9 +1,9 @@
 ---
-name: code-context
-description: Ground AI answers in real source code — find usage examples, understand how systems work, and explore codebases. Use when the user wants to ask questions about a codebase, find code examples, understand how a feature is implemented, or explore how a system works. On invoke: shows a numbered list of local git repos, lets the user pick one or more or clone a new repo from GitHub, then searches the selected code to answer their question.
+name: rtfm
+description: "Ground AI answers in real source code — find usage examples, understand how systems work, and explore codebases. Use when the user wants to ask questions about a codebase, find code examples, understand how a feature is implemented, or explore how a system works. On invoke: shows a numbered list of local git repos, lets the user pick one or more or clone a new repo from GitHub, then searches the selected code to answer their question."
 ---
 
-# Code Context
+# RTFM
 
 Ask your repos, not the internet.
 
@@ -12,7 +12,7 @@ Ask your repos, not the internet.
 Run the list script and show the output to the user:
 
 ```bash
-bash .claude/skills/code-context/scripts/list-repos.sh
+bash .claude/skills/rtfm/scripts/list-repos.sh
 ```
 
 Ask the user to:
@@ -25,7 +25,7 @@ Ask the user to:
 3. Run:
 
 ```bash
-bash .claude/skills/code-context/scripts/clone-repo.sh "<url-or-owner/repo>" "<branch>"
+bash .claude/skills/rtfm/scripts/clone-repo.sh "<url-or-owner/repo>" "<branch>"
 ```
 
 4. Re-run the list script and confirm the repo appears, then ask the user to select it.

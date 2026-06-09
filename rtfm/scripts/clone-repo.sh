@@ -4,7 +4,7 @@ set -e
 
 INPUT="$1"
 BRANCH="${2:-main}"
-DEST="$HOME/code-context-repos"
+DEST="$HOME/rtfm-repos"
 
 if [ -z "$INPUT" ]; then
   echo "Usage: clone-repo.sh <url-or-owner/repo> [branch]" >&2
